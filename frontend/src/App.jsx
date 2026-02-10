@@ -1,10 +1,16 @@
+import "./App.css";
 import Usuarios from "./componentes/Usuarios";
+import Tareas from "./componentes/tareas";
 
 export default function App() {
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>ToDo App</h1>
-      <Usuarios />
+    <div className="container">
+      <h1 className="title">Aplicación ToDo Full Stack</h1>
+
+      <div className="grid-2">
+        <Usuarios />
+        <Tareas />
+      </div>
     </div>
   );
 }

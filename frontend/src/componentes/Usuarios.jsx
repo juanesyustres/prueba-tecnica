@@ -29,10 +29,10 @@ export default function Usuarios() {
   }, []);
 
   return (
-    <div style={{ border: "1px solid #ccc", padding: "15px", marginBottom: "15px" }}>
+    <div className="card">    
       <h2>Usuarios</h2>
 
-      <form onSubmit={crearUsuario}>
+      <form className="form-row" onSubmit={crearUsuario}>
         <input
           type="text"
           placeholder="Nombre"
@@ -47,7 +47,7 @@ export default function Usuarios() {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <button type="submit">Crear Usuario</button>
+        <button className="btn-primary" type="submit">Crear Usuario</button>
       </form>
 
       <h3>Lista de Usuarios</h3>

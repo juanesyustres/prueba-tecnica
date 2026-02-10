@@ -1,42 +1,131 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* Base */
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f6f9;
+  color: #111;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.title {
   text-align: center;
+  margin-bottom: 20px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #222;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Layout */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+@media (max-width: 900px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
+/* Card */
 .card {
-  padding: 2em;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+  color: #111;
 }
 
-.read-the-docs {
-  color: #888;
+.card h2,
+.card h3 {
+  color: #1f2937;
+  margin-top: 0;
 }
+
+/* Forms */
+.form-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+input, select, textarea {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+
+  background: #fff !important;
+  color: #111 !important;
+}
+
+input::placeholder {
+  color: #777;
+}
+
+/* Buttons */
+button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 5px 0;
+  font-weight: bold;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: #fff;
+}
+.btn-primary:hover { background: #0056b3; }
+
+.btn-success {
+  background: #28a745;
+  color: #fff;
+}
+.btn-success:hover { background: #1e7e34; }
+
+.btn-danger {
+  background: #dc3545;
+  color: #fff;
+}
+.btn-danger:hover { background: #a71d2a; }
+
+/* Lista de tareas */
+.lista {
+  margin-top: 15px;
+  padding-left: 0;
+  list-style: none;
+}
+
+.lista li {
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Badges */
+.badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.badge-pendiente { background: orange; }
+.badge-completada { background: green; }
+.badge-progreso { background: #17a2b8; }
