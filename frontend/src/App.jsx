@@ -1,6 +1,8 @@
 import "./App.css";
+
 import Usuarios from "./componentes/Usuarios";
-import Tareas from "./componentes/tareas";
+import Tareas from "./componentes/Tareas";
+import Estadisticas from "./componentes/Estadisticas";
 
 export default function App() {
   return (
@@ -11,6 +13,8 @@ export default function App() {
         <Usuarios />
         <Tareas />
       </div>
+
+      <Estadisticas />
     </div>
   );
 }

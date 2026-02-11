@@ -10,10 +10,16 @@ export default function Tareas() {
   const [descripcion, setDescripcion] = useState("");
   const [usuarioId, setUsuarioId] = useState("");
 
+  const [estado, setEstado] = useState("pendiente");
+  const [prioridad, setPrioridad] = useState("media");
+  const [fechaVencimiento, setFechaVencimiento] = useState("");
+
   // Filtros
   const [filtroEstado, setFiltroEstado] = useState("");
   const [filtroPrioridad, setFiltroPrioridad] = useState("");
   const [filtroUsuario, setFiltroUsuario] = useState("");
+
+  const [editandoId, setEditandoId] = useState(null);
 
   // Cargar usuarios
   const cargarUsuarios = async () => {
@@ -33,25 +39,39 @@ export default function Tareas() {
     setTareas(res.data);
   };
 
-  // ✅ Convertir usuario_id -> nombre
+  // Convertir usuario_id -> nombre
   const nombreUsuario = (id) => {
     const u = usuarios.find((x) => x.id === Number(id));
     return u ? u.nombre : `ID ${id}`;
   };
 
-  // Crear tarea
-  const crearTarea = async (e) => {
+  // Crear / Editar tarea
+  const onSubmitTarea = async (e) => {
     e.preventDefault();
 
-    await api.post("/api/tareas", {
+    const payload = {
       titulo,
       descripcion,
-      usuario_id: Number(usuarioId)
-    });
+      usuario_id: Number(usuarioId),
+      estado,
+      prioridad,
+      fecha_vencimiento: fechaVencimiento || null
+    };
 
+    if (editandoId) {
+      await api.put(`/api/tareas/${editandoId}`, payload);
+    } else {
+      await api.post("/api/tareas", payload);
+    }
+
+    // reset formulario
+    setEditandoId(null);
     setTitulo("");
     setDescripcion("");
     setUsuarioId("");
+    setEstado("pendiente");
+    setPrioridad("media");
+    setFechaVencimiento("");
 
     cargarTareas();
   };
@@ -62,10 +82,31 @@ export default function Tareas() {
     cargarTareas();
   };
 
-  // Completar tarea
+  // Completar tarea (solo cambia estado)
   const completarTarea = async (id) => {
     await api.put(`/api/tareas/${id}`, { estado: "completada" });
     cargarTareas();
+  };
+
+  // Editar (cargar en formulario)
+  const editarTarea = (t) => {
+    setEditandoId(t.id);
+    setTitulo(t.titulo);
+    setDescripcion(t.descripcion || "");
+    setUsuarioId(String(t.usuario_id));
+    setEstado(t.estado);
+    setPrioridad(t.prioridad);
+    setFechaVencimiento(t.fecha_vencimiento ? t.fecha_vencimiento.slice(0, 10) : "");
+  };
+
+  const cancelarEdicion = () => {
+    setEditandoId(null);
+    setTitulo("");
+    setDescripcion("");
+    setUsuarioId("");
+    setEstado("pendiente");
+    setPrioridad("media");
+    setFechaVencimiento("");
   };
 
   // Cargar al iniciar
@@ -74,7 +115,7 @@ export default function Tareas() {
     cargarTareas();
   }, []);
 
-  // Volver a cargar cuando cambien filtros
+  // Recargar cuando cambien filtros
   useEffect(() => {
     cargarTareas();
   }, [filtroEstado, filtroPrioridad, filtroUsuario]);
@@ -83,8 +124,9 @@ export default function Tareas() {
     <div className="card">
       <h2>Tareas</h2>
 
-      <h3>Crear tarea</h3>
-      <form className="form-row" onSubmit={crearTarea}>
+      <h3>{editandoId ? "Editar tarea" : "Crear tarea"}</h3>
+
+      <form className="form-row" onSubmit={onSubmitTarea}>
         <input
           type="text"
           placeholder="Título"
@@ -109,9 +151,33 @@ export default function Tareas() {
           ))}
         </select>
 
+        <select value={estado} onChange={(e) => setEstado(e.target.value)}>
+          <option value="pendiente">pendiente</option>
+          <option value="en_progreso">en_progreso</option>
+          <option value="completada">completada</option>
+        </select>
+
+        <select value={prioridad} onChange={(e) => setPrioridad(e.target.value)}autoComplete="off">
+          <option value="baja">baja</option>
+          <option value="media">media</option>
+          <option value="alta">alta</option>
+        </select>
+
+        <input
+          type="date"
+          value={fechaVencimiento}
+          onChange={(e) => setFechaVencimiento(e.target.value)}
+        />
+
         <button className="btn-primary" type="submit">
-          Crear tarea
+          {editandoId ? "Guardar cambios" : "Crear tarea"}
         </button>
+
+        {editandoId && (
+          <button className="btn-danger" type="button" onClick={cancelarEdicion}>
+            Cancelar
+          </button>
+        )}
       </form>
 
       <hr />
@@ -145,16 +211,12 @@ export default function Tareas() {
       <hr />
 
       <h3>Lista de tareas</h3>
-
       {tareas.length === 0 ? (
         <p>No hay tareas todavía</p>
       ) : (
         <ul className="lista">
           {tareas.map((t) => (
-            <li
-              key={t.id}
-              style={{ opacity: t.estado === "completada" ? 0.7 : 1 }}
-            >
+            <li key={t.id} style={{ opacity: t.estado === "completada" ? 0.7 : 1 }}>
               <div>
                 <b>{t.titulo}</b>{" "}
                 <span
@@ -168,16 +230,25 @@ export default function Tareas() {
                 >
                   {t.estado}
                 </span>
-                {" "} (Usuario: {nombreUsuario(t.usuario_id)})
+                {" "}
+                — Prioridad: <b>{t.prioridad}</b>
+                {t.fecha_vencimiento && (
+                  <> — Vence: <b>{t.fecha_vencimiento.slice(0, 10)}</b></>
+                )}
+                {" "}
+                (Usuario: {nombreUsuario(t.usuario_id)})
               </div>
 
               <div>
-                {/* ✅ si ya está completada, no mostramos completar */}
                 {t.estado !== "completada" && (
                   <button className="btn-success" onClick={() => completarTarea(t.id)}>
                     Completar
                   </button>
                 )}
+
+                <button className="btn-primary" onClick={() => editarTarea(t)}>
+                  Editar
+                </button>
 
                 <button className="btn-danger" onClick={() => eliminarTarea(t.id)}>
                   Eliminar

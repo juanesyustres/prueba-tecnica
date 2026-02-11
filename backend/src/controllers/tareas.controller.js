@@ -159,12 +159,13 @@ if (nuevoEstado === "completada") {
       return res.status(400).json({ error: "El título no puede quedar vacío" });
     }
 
-    await pool.query(
+  await pool.query(
   `UPDATE tareas
    SET titulo = ?, descripcion = ?, estado = ?, prioridad = ?, fecha_vencimiento = ?, usuario_id = ?, fecha_completada = ?
    WHERE id = ?`,
   [nuevoTitulo, nuevaDescripcion, nuevoEstado, nuevaPrioridad, nuevaFecha, nuevoUsuario, nuevaFechaCompletada, id]
-  );
+);
+
 
 
     return res.json({ mensaje: "Tarea actualizada correctamente" });

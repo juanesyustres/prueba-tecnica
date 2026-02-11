@@ -8,7 +8,7 @@ const estadisticasRoutes = require("./src/routes/estadisticas.routes");
 const usuariosRoutes = require("./src/routes/usuarios.routes");
 const tareasRoutes = require("./src/routes/tareas.routes");
 
-const app = express(); // ✅ primero se crea app
+const app = express(); // primero se crea app
 
 // Middlewares
 app.use(cors());
@@ -18,6 +18,7 @@ app.use(express.json());
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/tareas", tareasRoutes);
 app.use("/api/estadisticas", estadisticasRoutes);
+
 
 
 // Ruta simple para saber si el backend está vivo
