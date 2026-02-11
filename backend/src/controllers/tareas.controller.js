@@ -141,6 +141,16 @@ const actualizarTarea = async (req, res) => {
     const nuevoTitulo = (titulo !== undefined) ? titulo : tarea.titulo;
     const nuevaDescripcion = (descripcion !== undefined) ? descripcion : tarea.descripcion;
     const nuevoEstado = (estado !== undefined) ? estado : tarea.estado;
+    // 5) Manejar fecha_completada según el estado
+let nuevaFechaCompletada = tarea.fecha_completada;
+
+if (nuevoEstado === "completada") {
+  // Si pasa a completada, guardar fecha/hora actual
+  nuevaFechaCompletada = new Date();
+} else {
+  // Si NO está completada, que quede null
+  nuevaFechaCompletada = null;
+}
     const nuevaPrioridad = (prioridad !== undefined) ? prioridad : tarea.prioridad;
     const nuevaFecha = (fecha_vencimiento !== undefined) ? fecha_vencimiento : tarea.fecha_vencimiento;
     const nuevoUsuario = (usuario_id !== undefined) ? usuario_id : tarea.usuario_id;
@@ -150,11 +160,12 @@ const actualizarTarea = async (req, res) => {
     }
 
     await pool.query(
-      `UPDATE tareas
-       SET titulo = ?, descripcion = ?, estado = ?, prioridad = ?, fecha_vencimiento = ?, usuario_id = ?
-       WHERE id = ?`,
-      [nuevoTitulo, nuevaDescripcion, nuevoEstado, nuevaPrioridad, nuevaFecha, nuevoUsuario, id]
-    );
+  `UPDATE tareas
+   SET titulo = ?, descripcion = ?, estado = ?, prioridad = ?, fecha_vencimiento = ?, usuario_id = ?, fecha_completada = ?
+   WHERE id = ?`,
+  [nuevoTitulo, nuevaDescripcion, nuevoEstado, nuevaPrioridad, nuevaFecha, nuevoUsuario, nuevaFechaCompletada, id]
+  );
+
 
     return res.json({ mensaje: "Tarea actualizada correctamente" });
   } catch (error) {

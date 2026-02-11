@@ -3,6 +3,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const pool = require("./src/config/db");
+const estadisticasRoutes = require("./src/routes/estadisticas.routes");
 
 const usuariosRoutes = require("./src/routes/usuarios.routes");
 const tareasRoutes = require("./src/routes/tareas.routes");
@@ -16,6 +17,8 @@ app.use(express.json());
 // Rutas
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/tareas", tareasRoutes);
+app.use("/api/estadisticas", estadisticasRoutes);
+
 
 // Ruta simple para saber si el backend está vivo
 app.get("/", (req, res) => {
