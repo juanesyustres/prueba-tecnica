@@ -1,20 +1,15 @@
 const pool = require("../config/db");
 
-///api/estadisticas/:usuario_id
+// /api/estadisticas/:usuario_id
 const obtenerEstadisticasUsuario = async (req, res) => {
   try {
     const { usuario_id } = req.params;
 
-    // 1) Validar que el usuario exista
-    const [userRows] = await pool.query(
-      "SELECT id FROM usuarios WHERE id = ?",
-      [usuario_id]
-    );
+    const [userRows] = await pool.query("SELECT id FROM usuarios WHERE id = ?", [usuario_id]);
     if (userRows.length === 0) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
-    // 2) Totales por estado
     const [porEstadoRows] = await pool.query(
       `SELECT estado, COUNT(*) AS total
        FROM tareas
@@ -28,7 +23,6 @@ const obtenerEstadisticasUsuario = async (req, res) => {
       por_estado[r.estado] = r.total;
     });
 
-    // 3) Totales por prioridad
     const [porPrioridadRows] = await pool.query(
       `SELECT prioridad, COUNT(*) AS total
        FROM tareas
@@ -42,7 +36,6 @@ const obtenerEstadisticasUsuario = async (req, res) => {
       por_prioridad[r.prioridad] = r.total;
     });
 
-    // 4) Tareas vencidas
     const [vencidasRows] = await pool.query(
       `SELECT COUNT(*) AS total
        FROM tareas
@@ -55,13 +48,12 @@ const obtenerEstadisticasUsuario = async (req, res) => {
 
     const vencidas = vencidasRows[0].total;
 
-    // 5) Promedio de días para completar
+    // Sin fecha_completada en esquema actual: aproximacion por fecha_actualizacion.
     const [promRows] = await pool.query(
-      `SELECT AVG(DATEDIFF(fecha_completada, fecha_creacion)) AS promedio
+      `SELECT AVG(DATEDIFF(fecha_actualizacion, fecha_creacion)) AS promedio
        FROM tareas
        WHERE usuario_id = ?
-         AND estado = 'completada'
-         AND fecha_completada IS NOT NULL`,
+         AND estado = 'completada'`,
       [usuario_id]
     );
 
@@ -80,10 +72,9 @@ const obtenerEstadisticasUsuario = async (req, res) => {
   }
 };
 
-///api/estadisticas   (GLOBAL - para que el frontend funcione)
+// /api/estadisticas
 const obtenerEstadisticasGlobal = async (req, res) => {
   try {
-    // 1) Totales por estado
     const [porEstadoRows] = await pool.query(
       `SELECT estado, COUNT(*) AS total
        FROM tareas
@@ -95,7 +86,6 @@ const obtenerEstadisticasGlobal = async (req, res) => {
       por_estado[r.estado] = r.total;
     });
 
-    // 2) Totales por prioridad
     const [porPrioridadRows] = await pool.query(
       `SELECT prioridad, COUNT(*) AS total
        FROM tareas
@@ -107,7 +97,6 @@ const obtenerEstadisticasGlobal = async (req, res) => {
       por_prioridad[r.prioridad] = r.total;
     });
 
-    // 3) Tareas vencidas
     const [vencidasRows] = await pool.query(
       `SELECT COUNT(*) AS total
        FROM tareas
@@ -118,12 +107,11 @@ const obtenerEstadisticasGlobal = async (req, res) => {
 
     const vencidas = vencidasRows[0].total;
 
-    // 4) Promedio de días para completar
+    // Sin fecha_completada en esquema actual: aproximacion por fecha_actualizacion.
     const [promRows] = await pool.query(
-      `SELECT AVG(DATEDIFF(fecha_completada, fecha_creacion)) AS promedio
+      `SELECT AVG(DATEDIFF(fecha_actualizacion, fecha_creacion)) AS promedio
        FROM tareas
-       WHERE estado = 'completada'
-         AND fecha_completada IS NOT NULL`
+       WHERE estado = 'completada'`
     );
 
     const promedio_dias_completar =

@@ -25,7 +25,18 @@ export default function Usuarios() {
   };
 
   useEffect(() => {
-    cargarUsuarios();
+    let activo = true;
+
+    api
+      .get("/api/usuarios")
+      .then((res) => {
+        if (activo) setUsuarios(res.data);
+      })
+      .catch(() => {});
+
+    return () => {
+      activo = false;
+    };
   }, []);
 
   return (
